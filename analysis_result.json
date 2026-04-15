@@ -1,0 +1,52 @@
+This document is a **Certificate of No Marriage Record (CENOMAR)**, not a marriage certificate itself. It certifies that *no marriage record* was found for the specified person. Therefore, fields like "Husband's Name," "Wife's Name," "Date of Marriage," and "Place of Marriage" will indicate "No record found" or "N/A".
+
+Here is the extracted information in JSON format:
+
+```json
+{
+  "document_type": "Certificate of No Marriage Record (CENOMAR)",
+  "crs_form_no": "CRS Form No. 4",
+  "issuing_authority": "PHILIPPINE STATISTICS AUTHORITY",
+  "issuing_office": "OFFICE OF THE CIVIL REGISTRAR GENERAL",
+  "office_location": "Manila",
+  "certification_date": "November 28, 2025",
+  "subject_of_certification": {
+    "full_name": "MARINEL ESPINA SURETA",
+    "gender": "Female",
+    "alleged_birth_date": "May 02, 1996",
+    "alleged_birth_place": "PARACALE, CAMARINES NORTE",
+    "alleged_father_name": "MARIO DASCO SURETA",
+    "alleged_mother_name": "NILDA RODRIGUEZ ESPINA"
+  },
+  "marriage_status": {
+    "record_found": false,
+    "message": "does not appear in our National Indices of Marriages",
+    "search_period": "1945-2025",
+    "search_as_of_date": "November 28, 2025"
+  },
+  "request_details": {
+    "requested_by": "MARINEL E. SURETA",
+    "purpose": "for MARRIAGE"
+  },
+  "certifying_official": {
+    "name": "CLAIRE DENNIS S. MAPA, Ph. D.",
+    "title": "National Statistician and Civil Registrar General"
+  },
+  "document_identifiers": {
+    "request_reference_number": "09463-3F-999JFA-07018-ME001",
+    "transaction_number": "T001094639990701811282025001",
+    "document_security_number": "DT400833782"
+  },
+  "notes": [
+    "Documentary Stamp Tax Paid",
+    "This certification is not valid if it contains erasures or alterations."
+  ],
+  "requested_marriage_certificate_fields": {
+    "Registry No": "N/A (This is a Certificate of No Marriage Record, not a marriage certificate)",
+    "Husband's Name": "N/A (No marriage record found for Marinel Espina Sureta)",
+    "Wife's Name": "MARINEL ESPINA SURETA (as the subject of certification, no marriage record found)",
+    "Date of Marriage": "N/A (No marriage record found)",
+    "Place of Marriage": "N/A (No marriage record found)"
+  }
+}
+```
