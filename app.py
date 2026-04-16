@@ -4,7 +4,8 @@ import logging
 import sys
 import time
 import traceback
-from flask import Flask, request, send_file, jsonify
+import json
+from flask import Flask, request, send_file, jsonify, Response
 from google import genai
 from google.genai import types
 from reportlab.pdfgen import canvas
@@ -12,9 +13,6 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
-import json
-import re
-
 
 # ======================
 # Logging
@@ -29,14 +27,11 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # ======================
-# Gemini
+# ENV
 # ======================
-API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
-if not API_KEY:
-    logger.error("❌ GEMINI_API_KEY 未設定")
-
-client = genai.Client(api_key=API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # ======================
 # Font
@@ -45,27 +40,18 @@ FONT_NAME = "NotoSansJP"
 FONT_PATH = "NotoSansJP-Regular.ttf"
 
 if os.path.exists(FONT_PATH):
-    try:
-        pdfmetrics.registerFont(TTFont(FONT_NAME, FONT_PATH))
-        logger.info("✅ フォント読み込み成功")
-    except Exception as e:
-        logger.error(f"❌ フォントエラー: {e}")
-        FONT_NAME = "Helvetica"
+    pdfmetrics.registerFont(TTFont(FONT_NAME, FONT_PATH))
 else:
-    logger.warning("⚠ フォント未検出 → Helvetica使用")
     FONT_NAME = "Helvetica"
 
 # ======================
-# Translation（安定版）
+# Gemini
 # ======================
 def translate_image_to_text(image_bytes, mime_type):
     prompt = """
 画像はフィリピンの独身証明書（CENOMAR）です。
-
-以下のJSON形式で情報を抽出し、
-すべて日本語に翻訳してください。
-
-必ずJSONのみ返してください。
+JSON形式で情報を抽出し、日本語に翻訳してください。
+JSONのみ返してください。
 
 {
   "title": "",
@@ -81,7 +67,7 @@ def translate_image_to_text(image_bytes, mime_type):
 }
 """
 
-    for attempt in range(3):
+    for _ in range(3):
         try:
             res = client.models.generate_content(
                 model="gemini-2.5-flash",
@@ -90,8 +76,6 @@ def translate_image_to_text(image_bytes, mime_type):
                         role="user",
                         parts=[
                             types.Part.from_text(text=prompt),
-
-                            # ★ここが正解（画像を渡す）
                             types.Part.from_bytes(
                                 data=image_bytes,
                                 mime_type=mime_type
@@ -101,44 +85,23 @@ def translate_image_to_text(image_bytes, mime_type):
                 ]
             )
 
-            if res and res.text:
-                text = res.text.strip()
+            text = res.text.strip()
 
-                # ```json 対策
-                if text.startswith("```"):
-                    text = text.replace("```json", "").replace("```", "").strip()
+            if text.startswith("```"):
+                text = text.replace("```json", "").replace("```", "").strip()
 
-                return json.loads(text)
-
-            raise Exception("JSON取得失敗")
+            return json.loads(text)
 
         except Exception as e:
-            error_str = str(e)
-            logger.error(f"Gemini Error: {error_str}")
+            logger.error(f"Gemini Error: {e}")
+            time.sleep(1)
 
-            # 混雑
-            if "503" in error_str:
-                if attempt < 2:
-                    time.sleep(1)
-                    continue
-                raise Exception("AIが混雑しています")
-
-            # 制限
-            if "429" in error_str:
-                raise Exception("利用制限に達しました")
-
-            # JSONエラー対策
-            if "Expecting value" in error_str:
-                raise Exception("AIの応答形式が不正です")
-
-            raise e
-
-    raise Exception("AIが混雑しています")
+    raise Exception("AIエラー")
 
 # ======================
 # PDF生成
 # ======================
-def create_pdf(data, name, address):
+def create_pdf(data, name="", address=""):
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
 
@@ -149,80 +112,40 @@ def create_pdf(data, name, address):
 
     y = height - 60
 
-    # タイトル（左）
     c.setFont(FONT_NAME, 12)
     c.drawString(left, y, data.get("title", ""))
-
-    # 日付（右）
-    c.setFont(FONT_NAME, 11)
     c.drawRightString(right, y, data.get("date", ""))
 
-    y -= 25
+    y -= 30
 
-    # 中央ヘッダー
     c.setFont(FONT_NAME, 13)
-    c.drawCentredString(center, y, data.get("country", ""))
-    y -= 20
-    c.drawCentredString(center, y, data.get("agency", ""))
-    y -= 20
-    c.drawCentredString(center, y, data.get("location", ""))
-    y -= 20
-    c.drawCentredString(center, y, data.get("office", ""))
+    for key in ["country", "agency", "location", "office"]:
+        c.drawCentredString(center, y, data.get(key, ""))
+        y -= 20
 
-    y -= 40
+    y -= 20
 
-    # 本文
     c.setFont(FONT_NAME, 11)
-    max_width = width - 100
-
-    def split_line(line):
-        result = []
-        current = ""
-
-        for ch in line:
-            try:
-                w = pdfmetrics.stringWidth(current + ch, FONT_NAME, 11)
-            except:
-                w = max_width + 1
-
-            if w <= max_width:
-                current += ch
-            else:
-                result.append(current)
-                current = ch
-
-        if current:
-            result.append(current)
-
-        return result
-
-    y_text = y
-
     for line in data.get("body", "").split("\n"):
-        for l in split_line(line.strip()):
-            if y_text < 200:
-                break
-            c.drawString(left, y_text, l)
-            y_text -= 16
+        c.drawString(left, y, line)
+        y -= 15
 
-    # 署名（右）
+    # 署名
     sign_y = 150
-    c.drawRightString(right, sign_y, "署名")
-    sign_y -= 20
     c.drawRightString(right, sign_y, data.get("sign_name", ""))
-    sign_y -= 18
+    sign_y -= 15
     c.drawRightString(right, sign_y, data.get("sign_title", ""))
-    sign_y -= 18
+    sign_y -= 15
     c.drawRightString(right, sign_y, data.get("sign_org", ""))
 
-    # 翻訳情報（左下）
+    # 翻訳情報
     footer_y = 100
     today = datetime.now().strftime("%Y年%m月%d日")
 
     c.drawString(left, footer_y, f"翻訳日: {today}")
-    footer_y -= 18
+    footer_y -= 15
     c.drawString(left, footer_y, f"翻訳者: {name}")
-    footer_y -= 18
+    footer_y -= 15
     c.drawString(left, footer_y, f"住所: {address}")
 
     c.save()
@@ -230,104 +153,73 @@ def create_pdf(data, name, address):
     return buffer
 
 # ======================
-# UI（そのまま維持）
+# LP + UI
 # ======================
 @app.route('/')
 def index():
-    return """<!DOCTYPE html>
+    return Response("""
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>AI Translator</title>
+<title>AI翻訳サービス</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<div class="bg-white p-8 rounded-2xl shadow w-96">
-<h1 class="text-xl font-bold mb-4 text-center">翻訳PDF生成</h1>
+<body class="bg-gray-100">
+
+<!-- 警告バナー -->
+<div id="warning" class="hidden bg-red-500 text-white text-center p-3">
+⚠ LINE内ブラウザではPDF保存ができない場合があります。<br>
+右上メニューから「ブラウザで開く」を選択してください。
+</div>
+
+<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-xl shadow">
+
+<h1 class="text-2xl font-bold text-center mb-4">
+📄 AI翻訳サービス
+</h1>
+
+<p class="text-center mb-6 text-gray-600">
+画像をアップロードするだけで日本語PDFを生成します
+</p>
 
 <form id="form" class="space-y-3">
 <input type="file" id="file" accept="image/*" class="w-full">
 <input type="text" id="name" placeholder="翻訳者名" class="w-full border p-2 rounded">
 <input type="text" id="address" placeholder="住所" class="w-full border p-2 rounded">
-<button id="btn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+
+<button class="w-full bg-blue-600 text-white p-2 rounded">
 PDF生成
 </button>
 </form>
 
 <p id="error" class="text-red-500 mt-3 text-sm"></p>
-</div>
 
-<!-- ローディング -->
-<div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-<div class="bg-white p-6 rounded-xl w-80 text-center">
-
-<div class="h-10 w-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-
-<p id="phase" class="mt-4 font-bold">準備中...</p>
-
-<div class="w-full bg-gray-200 h-3 mt-4 rounded">
-<div id="bar" class="h-3 bg-blue-600 w-0"></div>
-</div>
-
-<p id="percent" class="text-sm mt-2">0%</p>
-<p id="timer" class="text-xs text-gray-500 mt-1">0.0秒</p>
-
-</div>
 </div>
 
 <script>
-const form = document.getElementById("form")
-const error = document.getElementById("error")
-const overlay = document.getElementById("overlay")
-const btn = document.getElementById("btn")
-
-const phase = document.getElementById("phase")
-const bar = document.getElementById("bar")
-const percent = document.getElementById("percent")
-const timer = document.getElementById("timer")
-
-let interval, timerInt
-
-function startUI(){
- overlay.classList.remove("hidden")
- btn.disabled = true
- btn.textContent = "処理中..."
-
- let p = 0
- interval = setInterval(()=>{
-  if(p < 90){
-    p += Math.random()*10
-    p = Math.min(p,90)
-    bar.style.width = p+"%"
-    percent.textContent = Math.floor(p)+"%"
-  }
- },500)
-
- const start = Date.now()
- timerInt = setInterval(()=>{
-  timer.textContent = ((Date.now()-start)/1000).toFixed(1)+"秒"
- },100)
-
- setTimeout(()=>phase.textContent="翻訳中...",1500)
- setTimeout(()=>phase.textContent="PDF生成中...",3500)
+// ======================
+// LINE内ブラウザ検知
+// ======================
+if (navigator.userAgent.includes("Line")) {
+  document.getElementById("warning").classList.remove("hidden");
 }
 
-function endUI(){
- clearInterval(interval)
- clearInterval(timerInt)
- bar.style.width="100%"
- percent.textContent="100%"
- phase.textContent="完了"
+// ======================
+// 外部ブラウザ強制誘導
+// ======================
+const params = new URLSearchParams(window.location.search);
 
- setTimeout(()=>{
-  overlay.classList.add("hidden")
-  btn.disabled=false
-  btn.textContent="PDF生成"
- },800)
+if (!params.get("openExternalBrowser") && navigator.userAgent.includes("Line")) {
+  const url = window.location.href + "?openExternalBrowser=1";
+  window.location.href = url;
 }
 
-form.addEventListener("submit", async e=>{
+// ======================
+// フォーム送信
+// ======================
+document.getElementById("form").addEventListener("submit", async e => {
  e.preventDefault()
 
  const file = document.getElementById("file").files[0]
@@ -338,9 +230,6 @@ form.addEventListener("submit", async e=>{
   alert("画像を選択してください")
   return
  }
-
- error.textContent=""
- startUI()
 
  const fd = new FormData()
  fd.append("image", file)
@@ -361,26 +250,18 @@ form.addEventListener("submit", async e=>{
 
   }else{
     const data = await res.json()
-
-    if(res.status===503){
-      error.textContent="AIが混雑しています。少し待ってください"
-    }else if(res.status===429){
-      error.textContent="利用制限に達しました"
-    }else{
-      error.textContent=data.error
-    }
+    document.getElementById("error").textContent = data.error
   }
 
  }catch{
-  error.textContent="通信エラー"
+  document.getElementById("error").textContent = "通信エラー"
  }
-
- endUI()
 })
 </script>
+
 </body>
 </html>
-"""
+""", mimetype='text/html')
 
 # ======================
 # API
@@ -388,52 +269,20 @@ form.addEventListener("submit", async e=>{
 @app.route('/process', methods=['POST'])
 def process():
     try:
-        if 'image' not in request.files:
-            return jsonify({"error": "画像がありません"}), 400
-
         img = request.files['image']
-
-        if img.filename == "":
-            return jsonify({"error": "ファイルが選択されていません"}), 400
-
         name = request.form.get("name", "")
         address = request.form.get("address", "")
 
-        logger.info(f"📥 file: {img.filename}")
-
         image_bytes = img.read()
 
-        if not image_bytes:
-            return jsonify({"error": "ファイルが空です"}), 400
-
-        # ★ここが重要（置き換え）
         data = translate_image_to_text(image_bytes, img.content_type)
-
-        logger.info("✅ 翻訳成功")
-
-        # ★ここもdataに変更
         pdf = create_pdf(data, name, address)
 
-        return send_file(
-            pdf,
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name='translated.pdf'
-        )
+        return send_file(pdf, mimetype='application/pdf')
 
     except Exception as e:
-        traceback.print_exc()
-
-        error_str = str(e)
-        logger.error(f"❌ ERROR: {error_str}")
-
-        if "混雑" in error_str or "503" in error_str:
-            return jsonify({"error": "AIが混雑しています。少し待ってください"}), 503
-
-        if "制限" in error_str or "429" in error_str:
-            return jsonify({"error": "利用制限に達しました"}), 429
-
-        return jsonify({"error": f"サーバーエラー: {error_str}"}), 500
+        logger.error(str(e))
+        return jsonify({"error": str(e)}), 500
 
 # ======================
 # Run
