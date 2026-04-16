@@ -4,8 +4,7 @@ import logging
 import sys
 import time
 import traceback
-import json
-from flask import Flask, request, send_file, jsonify, Response
+from flask import Flask, request, send_file, jsonify
 from google import genai
 from google.genai import types
 from reportlab.pdfgen import canvas
@@ -13,6 +12,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
+import json
 
 # ======================
 # Logging
@@ -27,11 +27,14 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # ======================
-# ENV
+# Gemini
 # ======================
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+if not API_KEY:
+    logger.error("❌ GEMINI_API_KEY 未設定")
+
+client = genai.Client(api_key=API_KEY)
 
 # ======================
 # Font
@@ -40,19 +43,36 @@ FONT_NAME = "NotoSansJP"
 FONT_PATH = "NotoSansJP-Regular.ttf"
 
 if os.path.exists(FONT_PATH):
-    pdfmetrics.registerFont(TTFont(FONT_NAME, FONT_PATH))
+    try:
+        pdfmetrics.registerFont(TTFont(FONT_NAME, FONT_PATH))
+        logger.info("✅ フォント読み込み成功")
+    except Exception as e:
+        logger.error(f"❌ フォントエラー: {e}")
+        FONT_NAME = "Helvetica"
 else:
+    logger.warning("⚠ フォント未検出 → Helvetica使用")
     FONT_NAME = "Helvetica"
+
+# ======================
+# 安定JSON変換
+# ======================
+def safe_json_parse(text):
+    try:
+        if text.startswith("```"):
+            text = text.replace("```json", "").replace("```", "").strip()
+        return json.loads(text)
+    except Exception:
+        logger.error(f"❌ JSONパース失敗: {text}")
+        raise Exception("AIの応答形式が不正です")
 
 # ======================
 # Gemini
 # ======================
-def translate_image_to_text(image_bytes, mime_type):
+def translate_image_to_text(image_bytes):
     prompt = """
 画像はフィリピンの独身証明書（CENOMAR）です。
 JSON形式で情報を抽出し、日本語に翻訳してください。
 JSONのみ返してください。
-
 {
   "title": "",
   "country": "",
@@ -67,7 +87,7 @@ JSONのみ返してください。
 }
 """
 
-    for _ in range(3):
+    for attempt in range(3):
         try:
             res = client.models.generate_content(
                 model="gemini-2.5-flash",
@@ -78,7 +98,7 @@ JSONのみ返してください。
                             types.Part.from_text(text=prompt),
                             types.Part.from_bytes(
                                 data=image_bytes,
-                                mime_type=mime_type
+                                mime_type="image/jpeg"
                             )
                         ]
                     )
@@ -86,22 +106,20 @@ JSONのみ返してください。
             )
 
             text = res.text.strip()
+            logger.info(f"AIレスポンス: {text[:200]}")
 
-            if text.startswith("```"):
-                text = text.replace("```json", "").replace("```", "").strip()
-
-            return json.loads(text)
+            return safe_json_parse(text)
 
         except Exception as e:
             logger.error(f"Gemini Error: {e}")
-            time.sleep(1)
+            time.sleep(2 * (attempt + 1))
 
-    raise Exception("AIエラー")
+    raise Exception("AIが混雑しています")
 
 # ======================
 # PDF生成
 # ======================
-def create_pdf(data, name="", address=""):
+def create_pdf(data, name, address):
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
 
@@ -112,114 +130,125 @@ def create_pdf(data, name="", address=""):
 
     y = height - 60
 
+    # タイトル
     c.setFont(FONT_NAME, 12)
     c.drawString(left, y, data.get("title", ""))
+
+    # 日付
+    c.setFont(FONT_NAME, 11)
     c.drawRightString(right, y, data.get("date", ""))
 
-    y -= 30
+    y -= 25
 
+    # ヘッダー
     c.setFont(FONT_NAME, 13)
     for key in ["country", "agency", "location", "office"]:
         c.drawCentredString(center, y, data.get(key, ""))
         y -= 20
 
-    y -= 20
+    y -= 40
 
+    # 本文
     c.setFont(FONT_NAME, 11)
+    max_width = width - 100
+
+    def split_line(line):
+        result = []
+        current = ""
+
+        for ch in line:
+            try:
+                w = pdfmetrics.stringWidth(current + ch, FONT_NAME, 11)
+            except:
+                w = max_width + 1
+
+            if w <= max_width:
+                current += ch
+            else:
+                if current:
+                    result.append(current)
+                current = ch
+
+        if current:
+            result.append(current)
+
+        return result
+
+    y_text = y
+
     for line in data.get("body", "").split("\n"):
-        c.drawString(left, y, line)
-        y -= 15
+        for l in split_line(line.strip()):
+            if y_text < 200:
+                break
+            c.drawString(left, y_text, l)
+            y_text -= 16
 
     # 署名
     sign_y = 150
+    c.drawRightString(right, sign_y, "署名")
+    sign_y -= 20
     c.drawRightString(right, sign_y, data.get("sign_name", ""))
-    sign_y -= 15
+    sign_y -= 18
     c.drawRightString(right, sign_y, data.get("sign_title", ""))
-    sign_y -= 15
+    sign_y -= 18
     c.drawRightString(right, sign_y, data.get("sign_org", ""))
 
-    # 翻訳情報
+    # フッター
     footer_y = 100
     today = datetime.now().strftime("%Y年%m月%d日")
 
     c.drawString(left, footer_y, f"翻訳日: {today}")
-    footer_y -= 15
+    footer_y -= 18
     c.drawString(left, footer_y, f"翻訳者: {name}")
-    footer_y -= 15
+    footer_y -= 18
     c.drawString(left, footer_y, f"住所: {address}")
 
     c.save()
     buffer.seek(0)
-    return buffer
+
+    return buffer   # ← これ絶対この中
 
 # ======================
-# LP + UI
+# UI（ローディング付き）
 # ======================
 @app.route('/')
 def index():
-    return Response("""
-<!DOCTYPE html>
+    return """<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>AI翻訳サービス</title>
+<title>AI翻訳</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<body class="bg-gray-100">
+<div class="bg-white p-8 rounded-xl shadow w-96">
+<h1 class="text-xl font-bold mb-4 text-center">翻訳PDF生成</h1>
 
-<!-- 警告バナー -->
-<div id="warning" class="hidden bg-red-500 text-white text-center p-3">
-⚠ LINE内ブラウザではPDF保存ができない場合があります。<br>
-右上メニューから「ブラウザで開く」を選択してください。
-</div>
-
-<div class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-xl shadow">
-
-<h1 class="text-2xl font-bold text-center mb-4">
-📄 AI翻訳サービス
-</h1>
-
-<p class="text-center mb-6 text-gray-600">
-画像をアップロードするだけで日本語PDFを生成します
-</p>
-
-<form id="form" class="space-y-3">
-<input type="file" id="file" accept="image/*" class="w-full">
-<input type="text" id="name" placeholder="翻訳者名" class="w-full border p-2 rounded">
-<input type="text" id="address" placeholder="住所" class="w-full border p-2 rounded">
-
-<button class="w-full bg-blue-600 text-white p-2 rounded">
-PDF生成
-</button>
+<form id="form">
+<input type="file" id="file" class="mb-2">
+<input type="text" id="name" placeholder="翻訳者名" class="border p-2 w-full mb-2">
+<input type="text" id="address" placeholder="住所" class="border p-2 w-full mb-2">
+<button class="bg-blue-600 text-white w-full p-2 rounded">生成</button>
 </form>
 
-<p id="error" class="text-red-500 mt-3 text-sm"></p>
+<p id="error" class="text-red-500 mt-2"></p>
+</div>
 
+<!-- ローディング -->
+<div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-xl w-80 text-center">
+    <div class="h-10 w-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+    <p class="mt-4 font-bold">処理中...</p>
+  </div>
 </div>
 
 <script>
-// ======================
-// LINE内ブラウザ検知
-// ======================
-if (navigator.userAgent.includes("Line")) {
-  document.getElementById("warning").classList.remove("hidden");
-}
+const form = document.getElementById("form")
+const overlay = document.getElementById("overlay")
+const error = document.getElementById("error")
 
-// ======================
-// 外部ブラウザ強制誘導
-// ======================
-const params = new URLSearchParams(window.location.search);
-
-if (!params.get("openExternalBrowser") && navigator.userAgent.includes("Line")) {
-  const url = window.location.href + "?openExternalBrowser=1";
-  window.location.href = url;
-}
-
-// ======================
-// フォーム送信
-// ======================
-document.getElementById("form").addEventListener("submit", async e => {
+form.onsubmit = async e=>{
  e.preventDefault()
 
  const file = document.getElementById("file").files[0]
@@ -230,6 +259,9 @@ document.getElementById("form").addEventListener("submit", async e => {
   alert("画像を選択してください")
   return
  }
+
+ error.textContent = ""
+ overlay.classList.remove("hidden")
 
  const fd = new FormData()
  fd.append("image", file)
@@ -249,19 +281,35 @@ document.getElementById("form").addEventListener("submit", async e => {
     a.click()
 
   }else{
-    const data = await res.json()
-    document.getElementById("error").textContent = data.error
+    // 👇ここが重要（完全対応）
+    let msg = "エラーが発生しました"
+
+    try{
+      const data = await res.json()
+      msg = data.error || msg
+    }catch{}
+
+    if(res.status === 503){
+      msg = "AIが混雑しています。少し待って再度お試しください"
+    }
+
+    if(res.status === 429){
+      msg = "利用制限に達しました"
+    }
+
+    error.textContent = msg
   }
 
- }catch{
-  document.getElementById("error").textContent = "通信エラー"
+ }catch(e){
+  error.textContent = "通信エラー"
  }
-})
-</script>
 
+ overlay.classList.add("hidden")
+}
+</script>
 </body>
 </html>
-""", mimetype='text/html')
+"""
 
 # ======================
 # API
@@ -275,14 +323,20 @@ def process():
 
         image_bytes = img.read()
 
-        data = translate_image_to_text(image_bytes, img.content_type)
+        data = translate_image_to_text(image_bytes)
         pdf = create_pdf(data, name, address)
 
         return send_file(pdf, mimetype='application/pdf')
 
     except Exception as e:
-        logger.error(str(e))
-        return jsonify({"error": str(e)}), 500
+        traceback.print_exc()
+        error_str = str(e)
+
+        # ★ここが重要
+        if "混雑" in error_str:
+            return jsonify({"error": "現在アクセスが集中しています。少し待って再度お試しください"}), 503
+
+        return jsonify({"error": error_str}), 500
 
 # ======================
 # Run
