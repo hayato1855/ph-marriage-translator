@@ -218,134 +218,121 @@ def index():
 <html lang="ja" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<title>婚姻書類 翻訳サービス</title>
+<title>AI翻訳サービス</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
 
 <!-- ===== HERO ===== -->
-<section class="bg-white text-center py-16 px-6">
-  <h1 class="text-3xl font-bold mb-4">
-    フィリピン人との結婚手続きで<br>
-    「翻訳」で止まっていませんか？
+<section class="bg-white text-center py-20 px-6 shadow-sm">
+  <h1 class="text-3xl font-bold leading-relaxed">
+    フィリピン人との結婚手続きで必要な<br>
+    CENOMARを<br>
+    <span class="text-blue-600">そのまま提出できる形式で翻訳</span>
   </h1>
 
-  <p class="text-gray-600 mb-6">
-    CENOMAR（独身証明書）を<br>
-    <span class="font-bold">最短30秒で日本語PDF化</span>
+  <p class="mt-6 text-gray-600">
+    翻訳会社に頼まず、数秒でPDF生成
   </p>
 
   <a href="/translate"
-     class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700">
+     class="mt-8 inline-block bg-blue-600 text-white px-8 py-4 rounded-xl text-lg hover:bg-blue-700 shadow">
      無料で翻訳する
   </a>
 </section>
 
 <!-- ===== 悩み ===== -->
-<section class="max-w-4xl mx-auto py-12 px-6">
-  <h2 class="text-xl font-bold text-center mb-8">こんな悩みありませんか？</h2>
+<section class="bg-gray-100 py-16 px-6 text-center">
+  <h2 class="text-xl font-bold mb-8">こんな不安ありませんか？</h2>
 
-  <div class="space-y-4 text-gray-700">
-    <p>・CENOMARって何？どこに出すの？</p>
-    <p>・翻訳会社に頼むと高いし時間がかかる</p>
-    <p>・自分で訳して役所で突き返されるのが怖い</p>
+  <div class="max-w-xl mx-auto space-y-4 text-gray-700">
+    <p>✔ CENOMARって何を出せばいいの？</p>
+    <p>✔ 翻訳会社は高いし時間がかかる…</p>
+    <p>✔ 自分で訳して役所で突き返されたら怖い</p>
   </div>
 </section>
 
 <!-- ===== 解決 ===== -->
-<section class="bg-white py-12 px-6 text-center">
-  <h2 class="text-xl font-bold mb-6">その不安、このサービスで解決できます</h2>
+<section class="py-16 text-center">
+  <h2 class="text-xl font-bold mb-8">
+    その悩み、このツールで解決できます
+  </h2>
 
-  <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-
-    <div class="p-4">
-      <h3 class="font-bold mb-2">安心</h3>
-      <p class="text-sm text-gray-600">
-        翻訳者名・住所付きで<br>
-        そのまま提出可能な形式
-      </p>
-    </div>
-
-    <div class="p-4">
-      <h3 class="font-bold mb-2">高速</h3>
-      <p class="text-sm text-gray-600">
-        画像アップロードから<br>
-        数十秒でPDF完成
-      </p>
-    </div>
-
-    <div class="p-4">
-      <h3 class="font-bold mb-2">低コスト</h3>
-      <p class="text-sm text-gray-600">
-        翻訳会社不要<br>
-        無料で利用可能
-      </p>
-    </div>
-
+  <div class="space-y-4 text-gray-700">
+    <p>✔ 役所提出を想定した翻訳フォーマット</p>
+    <p>✔ 翻訳者署名・住所を自動付与</p>
+    <p>✔ PDF形式ですぐ提出可能</p>
   </div>
 </section>
 
-<!-- ===== 強み ===== -->
-<section class="max-w-4xl mx-auto py-12 px-6">
-  <h2 class="text-xl font-bold text-center mb-8">役所提出を前提に設計</h2>
+<!-- ===== 信頼 ===== -->
+<section class="bg-gray-100 py-16 px-6 text-center">
+  <h2 class="text-xl font-bold mb-6">安心してご利用いただくために</h2>
 
-  <div class="space-y-4 text-gray-700">
-    <p>✔ 翻訳証明（原文を正しく翻訳した旨）を明記</p>
-    <p>✔ 翻訳者の氏名・住所を記載</p>
-    <p>✔ 日本の役所提出を想定したレイアウト</p>
+  <p class="text-gray-700">
+    本サービスはAIを活用しつつ、公的書類として提出できる形式に整形しています。
+  </p>
+
+  <p class="mt-4 text-sm text-gray-500">
+    ※最終確認は必ずご自身で行ってください
+  </p>
+</section>
+
+<!-- ===== フロー ===== -->
+<section class="py-16 text-center">
+  <h2 class="text-xl font-bold mb-8">ご利用の流れ</h2>
+
+  <div class="space-y-3 text-gray-700">
+    <p>① 証明書画像をアップロード</p>
+    <p>② 自動翻訳</p>
+    <p>③ PDFをダウンロード</p>
   </div>
 </section>
 
 <!-- ===== CTA ===== -->
-<section class="text-center py-12">
+<section class="bg-blue-600 text-white text-center py-16">
+  <h2 class="text-xl font-bold mb-6">
+    今すぐ無料で翻訳を作成
+  </h2>
+
   <a href="/translate"
-     class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700">
-     今すぐ翻訳する
+     class="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg shadow">
+     翻訳を開始
   </a>
 </section>
 
 <!-- ===== 規約 ===== -->
-<section id="legal" class="bg-white p-8">
-  <h2 class="text-xl font-bold mb-6 text-center">利用規約・プライバシーポリシー</h2>
+<section id="legal" class="bg-white py-16 px-6">
+  <h2 class="text-xl font-bold mb-8 text-center">利用規約・プライバシーポリシー</h2>
 
-  <div class="grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
+  <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
 
     <div>
-      <h3 class="font-bold text-lg mb-2">利用規約</h3>
+      <h3 class="font-bold mb-2">利用規約</h3>
 
       <p class="font-semibold mt-3">免責事項</p>
-      <p>
-        本サービスはAI（人工知能）を用いた翻訳サービスです。
-        翻訳の正確性については保証されません。
-        提出前に必ず内容をご確認ください。
-      </p>
+      <p>本サービスはAI翻訳です。提出前に必ずご確認ください。責任は負いません。</p>
 
       <p class="font-semibold mt-3">データの取り扱い</p>
-      <p>
-        アップロードされた画像は処理後削除されます。
-      </p>
+      <p>画像は処理後すぐ削除されます。</p>
     </div>
 
     <div>
-      <h3 class="font-bold text-lg mb-2">プライバシーポリシー</h3>
+      <h3 class="font-bold mb-2">プライバシーポリシー</h3>
 
       <p class="font-semibold mt-3">個人情報</p>
-      <p>
-        入力情報はPDF生成のみに使用します。
-      </p>
+      <p>翻訳目的以外では使用しません。</p>
 
       <p class="font-semibold mt-3">外部サービス</p>
-      <p>
-        GoogleのAIサービスを利用しています。
-      </p>
+      <p>Google Gemini APIを利用しています。</p>
     </div>
 
   </div>
 </section>
 
-<footer class="text-center p-4 text-sm">
-<a href="#legal" class="text-blue-600">規約を見る</a>
+<footer class="text-center p-6 text-sm text-gray-500">
+  <a href="#legal" class="text-blue-600 underline">規約を見る</a>
 </footer>
 
 </body>
@@ -368,24 +355,29 @@ def translate_page():
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<div class="bg-white p-8 rounded-xl shadow w-96">
+<div class="bg-white p-8 rounded-2xl shadow-xl w-96">
+
+<h2 class="text-xl font-bold mb-4 text-center">翻訳PDF生成</h2>
+
 <form id="form">
 
-<input type="file" id="file" class="mb-2 w-full">
-<input type="text" id="name" placeholder="翻訳者名" class="border p-2 w-full mb-2">
-<input type="text" id="address" placeholder="住所" class="border p-2 w-full mb-2">
+<input type="file" id="file" class="mb-3 w-full">
+<input type="text" id="name" placeholder="翻訳者名" class="border p-2 w-full mb-3">
+<input type="text" id="address" placeholder="住所" class="border p-2 w-full mb-3">
 
-<button class="bg-blue-600 text-white w-full p-2 rounded">PDF生成</button>
+<button class="bg-blue-600 text-white w-full p-3 rounded-lg text-lg hover:bg-blue-700">
+PDFを生成する
+</button>
 
-<p class="text-xs text-gray-500 mt-3 text-center">
+<p class="text-xs text-gray-500 mt-4 text-center">
 ダウンロードすることで
-<a href="/#legal" class="text-blue-600 underline">規約同意</a>
-とみなします
+<a href="/#legal" class="text-blue-600 underline">利用規約</a>
+に同意したものとみなします
 </p>
 
 </form>
 
-<p id="error" class="text-red-500 mt-2 text-center"></p>
+<p id="error" class="text-red-500 mt-3 text-center"></p>
 </div>
 
 <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
@@ -403,7 +395,7 @@ form.onsubmit = async e=>{
  e.preventDefault()
 
  const file = document.getElementById("file").files[0]
- if(!file){ alert("画像選択"); return }
+ if(!file){ alert("画像を選択してください"); return }
 
  overlay.classList.remove("hidden")
  error.textContent = ""
@@ -429,7 +421,7 @@ form.onsubmit = async e=>{
       msg=d.error
     }catch{}
 
-    if(res.status===503) msg="AIが混雑しています。数秒後に再試行してください"
+    if(res.status===503) msg="AIが混雑しています"
     error.textContent=msg
   }
 
