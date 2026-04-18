@@ -218,66 +218,135 @@ def index():
 <html lang="ja" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<title>AI翻訳サービス</title>
+<title>婚姻書類 翻訳サービス</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-800">
 
-<header class="bg-white shadow p-4 text-center">
-  <h1 class="text-2xl font-bold">AI翻訳サービス</h1>
-</header>
+<!-- ===== HERO ===== -->
+<section class="bg-white text-center py-16 px-6">
+  <h1 class="text-3xl font-bold mb-4">
+    フィリピン人との結婚手続きで<br>
+    「翻訳」で止まっていませんか？
+  </h1>
 
-<section class="text-center p-10">
-  <a href="/translate" class="bg-blue-600 text-white px-6 py-3 rounded-lg">
-    翻訳を開始
+  <p class="text-gray-600 mb-6">
+    CENOMAR（独身証明書）を<br>
+    <span class="font-bold">最短30秒で日本語PDF化</span>
+  </p>
+
+  <a href="/translate"
+     class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700">
+     無料で翻訳する
   </a>
 </section>
 
+<!-- ===== 悩み ===== -->
+<section class="max-w-4xl mx-auto py-12 px-6">
+  <h2 class="text-xl font-bold text-center mb-8">こんな悩みありませんか？</h2>
+
+  <div class="space-y-4 text-gray-700">
+    <p>・CENOMARって何？どこに出すの？</p>
+    <p>・翻訳会社に頼むと高いし時間がかかる</p>
+    <p>・自分で訳して役所で突き返されるのが怖い</p>
+  </div>
+</section>
+
+<!-- ===== 解決 ===== -->
+<section class="bg-white py-12 px-6 text-center">
+  <h2 class="text-xl font-bold mb-6">その不安、このサービスで解決できます</h2>
+
+  <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+    <div class="p-4">
+      <h3 class="font-bold mb-2">安心</h3>
+      <p class="text-sm text-gray-600">
+        翻訳者名・住所付きで<br>
+        そのまま提出可能な形式
+      </p>
+    </div>
+
+    <div class="p-4">
+      <h3 class="font-bold mb-2">高速</h3>
+      <p class="text-sm text-gray-600">
+        画像アップロードから<br>
+        数十秒でPDF完成
+      </p>
+    </div>
+
+    <div class="p-4">
+      <h3 class="font-bold mb-2">低コスト</h3>
+      <p class="text-sm text-gray-600">
+        翻訳会社不要<br>
+        無料で利用可能
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== 強み ===== -->
+<section class="max-w-4xl mx-auto py-12 px-6">
+  <h2 class="text-xl font-bold text-center mb-8">役所提出を前提に設計</h2>
+
+  <div class="space-y-4 text-gray-700">
+    <p>✔ 翻訳証明（原文を正しく翻訳した旨）を明記</p>
+    <p>✔ 翻訳者の氏名・住所を記載</p>
+    <p>✔ 日本の役所提出を想定したレイアウト</p>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="text-center py-12">
+  <a href="/translate"
+     class="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700">
+     今すぐ翻訳する
+  </a>
+</section>
+
+<!-- ===== 規約 ===== -->
 <section id="legal" class="bg-white p-8">
   <h2 class="text-xl font-bold mb-6 text-center">利用規約・プライバシーポリシー</h2>
 
   <div class="grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
 
-    <!-- 利用規約 -->
     <div>
       <h3 class="font-bold text-lg mb-2">利用規約</h3>
 
       <p class="font-semibold mt-3">免責事項</p>
       <p>
         本サービスはAI（人工知能）を用いた翻訳サービスです。
-        翻訳の正確性については最善を尽くしておりますが、
-        公的機関への提出に際しては、必ずユーザー自身で内容の最終確認を行ってください。
-        本サービスを利用したことによって生じたいかなる不利益についても、
-        運営者は一切の責任を負いません。
+        翻訳の正確性については保証されません。
+        提出前に必ず内容をご確認ください。
       </p>
 
       <p class="font-semibold mt-3">データの取り扱い</p>
       <p>
-        ユーザーがアップロードした画像データは、
-        翻訳処理完了後、サーバー上から即座に破棄されます。
+        アップロードされた画像は処理後削除されます。
       </p>
     </div>
 
-    <!-- プライバシーポリシー -->
     <div>
       <h3 class="font-bold text-lg mb-2">プライバシーポリシー</h3>
 
-      <p class="font-semibold mt-3">個人情報の収集</p>
+      <p class="font-semibold mt-3">個人情報</p>
       <p>
-        本サービスでは、翻訳処理のために画像データおよび翻訳者情報を取得しますが、
-        これらはPDF生成の目的以外には使用しません。
+        入力情報はPDF生成のみに使用します。
       </p>
 
       <p class="font-semibold mt-3">外部サービス</p>
       <p>
-        本サービスは Google Gemini API を利用して解析を行っています。
-        送信されたデータはGoogleのプライバシーポリシーに従って処理されます。
+        GoogleのAIサービスを利用しています。
       </p>
     </div>
 
   </div>
 </section>
+
+<footer class="text-center p-4 text-sm">
+<a href="#legal" class="text-blue-600">規約を見る</a>
+</footer>
 
 </body>
 </html>
