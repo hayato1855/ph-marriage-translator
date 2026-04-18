@@ -243,27 +243,30 @@ def index():
 </section>
 
 <!-- ===== 悩み ===== -->
-<section class="bg-gray-100 py-16 px-6 text-center">
-  <h2 class="text-xl font-bold mb-8">
-    こんな不安ありませんか？
-  </h2>
+<section class="bg-gray-50 py-16 px-6">
+  <div class="max-w-3xl mx-auto">
 
-  <!-- ここが重要 -->
-  <div class="max-w-md mx-auto text-left space-y-5">
+    <h2 class="text-xl font-bold mb-8">
+      こんな不安はありませんか？
+    </h2>
 
-    <div class="flex items-start gap-3">
-      <span class="w-6 text-green-600 font-bold">✔</span>
-      <p>CENOMARって何を出せばいいの？</p>
-    </div>
+    <div class="space-y-5 text-gray-700">
 
-    <div class="flex items-start gap-3">
-      <span class="w-6 text-green-600 font-bold">✔</span>
-      <p>翻訳会社は高いし時間がかかる…</p>
-    </div>
+      <div class="flex items-start gap-3">
+        <span class="w-6 text-blue-600 font-bold">✔</span>
+        <p>CENOMARは何を提出すればいいのか分からない</p>
+      </div>
 
-    <div class="flex items-start gap-3">
-      <span class="w-6 text-green-600 font-bold">✔</span>
-      <p>自分で訳して役所で突き返されたら怖い</p>
+      <div class="flex items-start gap-3">
+        <span class="w-6 text-blue-600 font-bold">✔</span>
+        <p>翻訳会社に依頼すると費用や時間がかかる</p>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 text-blue-600 font-bold">✔</span>
+        <p>自己翻訳で役所に差し戻されないか不安</p>
+      </div>
+
     </div>
 
   </div>
