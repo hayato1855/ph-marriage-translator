@@ -225,7 +225,7 @@ def index():
 <body class="bg-gray-50 text-gray-800">
 
 <header class="bg-white shadow p-4 text-center">
-  <h1 class="text-2xl font-bold">婚姻書類 翻訳サービス</h1>
+  <h1 class="text-2xl font-bold">AI翻訳サービス</h1>
 </header>
 
 <section class="text-center p-10">
@@ -278,10 +278,6 @@ def index():
 
   </div>
 </section>
-
-<footer class="text-center p-4 text-sm">
-<a href="#legal" class="text-blue-600">規約を見る</a>
-</footer>
 
 </body>
 </html>
