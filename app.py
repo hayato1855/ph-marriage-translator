@@ -244,89 +244,109 @@ def index():
 
 <!-- ===== 悩み ===== -->
 <section class="bg-gray-100 py-16 px-6 text-center">
-  <h2 class="text-xl font-bold mb-8">こんな不安ありませんか？</h2>
+  <h2 class="text-xl font-bold mb-8">
+    こんな不安ありませんか？
+  </h2>
 
-  <div class="max-w-md mx-auto space-y-4 text-gray-700">
+  <!-- ここが重要 -->
+  <div class="max-w-md mx-auto text-left space-y-5">
 
-  <div class="flex items-start gap-3">
-    <span class="w-6 text-blue-600 font-bold">✔</span>
-    <p>CENOMARって何を出せばいいの？</p>
+    <div class="flex items-start gap-3">
+      <span class="w-6 text-green-600 font-bold">✔</span>
+      <p>CENOMARって何を出せばいいの？</p>
+    </div>
+
+    <div class="flex items-start gap-3">
+      <span class="w-6 text-green-600 font-bold">✔</span>
+      <p>翻訳会社は高いし時間がかかる…</p>
+    </div>
+
+    <div class="flex items-start gap-3">
+      <span class="w-6 text-green-600 font-bold">✔</span>
+      <p>自分で訳して役所で突き返されたら怖い</p>
+    </div>
+
   </div>
-
-  <div class="flex items-start gap-3">
-    <span class="w-6 text-blue-600 font-bold">✔</span>
-    <p>翻訳会社は高いし時間がかかる…</p>
-  </div>
-
-  <div class="flex items-start gap-3">
-    <span class="w-6 text-blue-600 font-bold">✔</span>
-    <p>自分で訳して役所で突き返されたら怖い</p>
-  </div>
-
-</div>
 </section>
 
 <!-- ===== 解決 ===== -->
-<section class="py-16 text-center">
-  <h2 class="text-xl font-bold mb-8">
-    その悩み、このツールで解決できます
-  </h2>
+<section class="py-16 px-6">
+  <div class="max-w-3xl mx-auto">
 
-  <div class="max-w-md mx-auto space-y-4 text-gray-700">
+    <h2 class="text-xl font-bold mb-6">
+      その悩み、このツールで解決できます
+    </h2>
 
-  <div class="flex items-start gap-3">
-    <span class="w-6 text-green-600 font-bold">✔</span>
-    <p>役所提出を想定した翻訳フォーマット</p>
+    <div class="space-y-4 text-gray-700">
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 text-green-600 font-bold">✔</span>
+        <p>役所提出を想定した翻訳フォーマット</p>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 text-green-600 font-bold">✔</span>
+        <p>翻訳者署名・住所を自動付与</p>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 text-green-600 font-bold">✔</span>
+        <p>PDF形式ですぐ提出可能</p>
+      </div>
+
+    </div>
+
   </div>
-
-  <div class="flex items-start gap-3">
-    <span class="w-6 text-green-600 font-bold">✔</span>
-    <p>翻訳者署名・住所を自動付与</p>
-  </div>
-
-  <div class="flex items-start gap-3">
-    <span class="w-6 text-green-600 font-bold">✔</span>
-    <p>PDF形式ですぐ提出可能</p>
-  </div>
-
-</div>
 </section>
 
 <!-- ===== 信頼 ===== -->
-<section class="bg-gray-100 py-16 px-6 text-center">
-  <h2 class="text-xl font-bold mb-6">安心してご利用いただくために</h2>
+<section class="py-16 px-6">
+  <div class="max-w-3xl mx-auto">
 
-  <p class="text-gray-700">
-    本サービスはAIを活用しつつ、公的書類として提出できる形式に整形しています。
-  </p>
+    <h2 class="text-xl font-bold mb-6">
+      安心してご利用いただくために
+    </h2>
 
-  <p class="mt-4 text-sm text-gray-500">
-    ※最終確認は必ずご自身で行ってください
-  </p>
+    <p class="text-gray-700 leading-relaxed">
+      本サービスはAIを活用して翻訳を行い、
+      公的書類として提出することを想定した形式でPDFを生成します。
+    </p>
+
+    <p class="mt-4 text-sm text-gray-500">
+      ※翻訳内容の最終確認は必ずご自身で行ってください
+    </p>
+
+  </div>
 </section>
 
 <!-- ===== フロー ===== -->
-<section class="py-16 text-center">
-  <h2 class="text-xl font-bold mb-8">ご利用の流れ</h2>
+<section class="bg-gray-50 py-16 px-6">
+  <div class="max-w-3xl mx-auto">
 
-  <div class="max-w-md mx-auto space-y-4 text-gray-700">
+    <h2 class="text-xl font-bold mb-8">
+      ご利用の流れ
+    </h2>
 
-  <div class="flex items-start gap-3">
-    <span class="w-6 font-bold text-blue-600">①</span>
-    <p>証明書画像をアップロード</p>
+    <div class="space-y-4 text-gray-700">
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 font-bold text-blue-600">①</span>
+        <p>証明書画像をアップロード</p>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 font-bold text-blue-600">②</span>
+        <p>AIが内容を解析し、日本語へ翻訳</p>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <span class="w-6 font-bold text-blue-600">③</span>
+        <p>翻訳済みPDFをダウンロードし、そのまま提出可能</p>
+      </div>
+
+    </div>
+
   </div>
-
-  <div class="flex items-start gap-3">
-    <span class="w-6 font-bold text-blue-600">②</span>
-    <p>自動翻訳</p>
-  </div>
-
-  <div class="flex items-start gap-3">
-    <span class="w-6 font-bold text-blue-600">③</span>
-    <p>PDFをダウンロード</p>
-  </div>
-
-</div>
 </section>
 
 <!-- ===== CTA ===== -->
