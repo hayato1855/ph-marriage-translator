@@ -208,39 +208,125 @@ def create_pdf(data, name, address):
 
     return buffer   # ← これ絶対この中
 
+
 # ======================
-# UI（ローディング付き）
+# LP
 # ======================
 @app.route('/')
 def index():
     return """<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<title>AI翻訳サービス</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+<header class="bg-white shadow p-4 text-center">
+  <h1 class="text-2xl font-bold">婚姻書類 翻訳サービス</h1>
+</header>
+
+<section class="text-center p-10">
+  <a href="/translate" class="bg-blue-600 text-white px-6 py-3 rounded-lg">
+    翻訳を開始
+  </a>
+</section>
+
+<section id="legal" class="bg-white p-8">
+  <h2 class="text-xl font-bold mb-6 text-center">利用規約・プライバシーポリシー</h2>
+
+  <div class="grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
+
+    <!-- 利用規約 -->
+    <div>
+      <h3 class="font-bold text-lg mb-2">利用規約</h3>
+
+      <p class="font-semibold mt-3">免責事項</p>
+      <p>
+        本サービスはAI（人工知能）を用いた翻訳サービスです。
+        翻訳の正確性については最善を尽くしておりますが、
+        公的機関への提出に際しては、必ずユーザー自身で内容の最終確認を行ってください。
+        本サービスを利用したことによって生じたいかなる不利益についても、
+        運営者は一切の責任を負いません。
+      </p>
+
+      <p class="font-semibold mt-3">データの取り扱い</p>
+      <p>
+        ユーザーがアップロードした画像データは、
+        翻訳処理完了後、サーバー上から即座に破棄されます。
+      </p>
+    </div>
+
+    <!-- プライバシーポリシー -->
+    <div>
+      <h3 class="font-bold text-lg mb-2">プライバシーポリシー</h3>
+
+      <p class="font-semibold mt-3">個人情報の収集</p>
+      <p>
+        本サービスでは、翻訳処理のために画像データおよび翻訳者情報を取得しますが、
+        これらはPDF生成の目的以外には使用しません。
+      </p>
+
+      <p class="font-semibold mt-3">外部サービス</p>
+      <p>
+        本サービスは Google Gemini API を利用して解析を行っています。
+        送信されたデータはGoogleのプライバシーポリシーに従って処理されます。
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="text-center p-4 text-sm">
+<a href="#legal" class="text-blue-600">規約を見る</a>
+</footer>
+
+</body>
+</html>
+"""
+
+
+# ======================
+# UI（ローディング付き）
+# ======================
+@app.route('/translate')
+def translate_page():
+    return """<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>AI翻訳</title>
+<title>AI翻訳サービス</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
 <div class="bg-white p-8 rounded-xl shadow w-96">
-<h1 class="text-xl font-bold mb-4 text-center">翻訳PDF生成</h1>
-
 <form id="form">
-<input type="file" id="file" class="mb-2">
+
+<input type="file" id="file" class="mb-2 w-full">
 <input type="text" id="name" placeholder="翻訳者名" class="border p-2 w-full mb-2">
 <input type="text" id="address" placeholder="住所" class="border p-2 w-full mb-2">
-<button class="bg-blue-600 text-white w-full p-2 rounded">生成</button>
+
+<button class="bg-blue-600 text-white w-full p-2 rounded">PDF生成</button>
+
+<p class="text-xs text-gray-500 mt-3 text-center">
+ダウンロードすることで
+<a href="/#legal" class="text-blue-600 underline">規約同意</a>
+とみなします
+</p>
+
 </form>
 
-<p id="error" class="text-red-500 mt-2"></p>
+<p id="error" class="text-red-500 mt-2 text-center"></p>
 </div>
 
-<!-- ローディング -->
 <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-xl w-80 text-center">
-    <div class="h-10 w-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-    <p class="mt-4 font-bold">処理中...</p>
-  </div>
+<div class="bg-white p-6 rounded-xl">
+<div class="h-10 w-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+</div>
 </div>
 
 <script>
@@ -252,61 +338,44 @@ form.onsubmit = async e=>{
  e.preventDefault()
 
  const file = document.getElementById("file").files[0]
- const name = document.getElementById("name").value
- const address = document.getElementById("address").value
+ if(!file){ alert("画像選択"); return }
 
- if(!file){
-  alert("画像を選択してください")
-  return
- }
-
- error.textContent = ""
  overlay.classList.remove("hidden")
+ error.textContent = ""
 
  const fd = new FormData()
  fd.append("image", file)
- fd.append("name", name)
- fd.append("address", address)
+ fd.append("name", document.getElementById("name").value)
+ fd.append("address", document.getElementById("address").value)
 
  try{
   const res = await fetch("/process",{method:"POST",body:fd})
 
   if(res.ok){
     const blob = await res.blob()
-    const url = URL.createObjectURL(blob)
-
     const a = document.createElement("a")
-    a.href = url
+    a.href = URL.createObjectURL(blob)
     a.download = "translated.pdf"
     a.click()
-
   }else{
-    // 👇ここが重要（完全対応）
-    let msg = "エラーが発生しました"
-
+    let msg="エラー"
     try{
-      const data = await res.json()
-      msg = data.error || msg
+      const d = await res.json()
+      msg=d.error
     }catch{}
 
-    if(res.status === 503){
-      msg = "AIが混雑しています。少し待って再度お試しください"
-    }
-
-    if(res.status === 429){
-      msg = "利用制限に達しました"
-    }
-
-    error.textContent = msg
+    if(res.status===503) msg="AIが混雑しています。数秒後に再試行してください"
+    error.textContent=msg
   }
 
- }catch(e){
-  error.textContent = "通信エラー"
+ }catch{
+  error.textContent="通信エラー"
  }
 
  overlay.classList.add("hidden")
 }
 </script>
+
 </body>
 </html>
 """
