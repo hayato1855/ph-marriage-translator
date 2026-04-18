@@ -377,29 +377,46 @@ def index():
 </section>
 
 <!-- ===== 規約 ===== -->
-<section id="legal" class="bg-white py-16 px-6">
-  <h2 class="text-xl font-bold mb-8 text-center">利用規約・プライバシーポリシー</h2>
+<section id="legal" class="bg-white p-8">
+  <h2 class="text-xl font-bold mb-6 text-center">利用規約・プライバシーポリシー</h2>
 
-  <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
+  <div class="grid md:grid-cols-2 gap-8 text-sm leading-relaxed">
 
+    <!-- 利用規約 -->
     <div>
-      <h3 class="font-bold mb-2">利用規約</h3>
+      <h3 class="font-bold text-lg mb-2">利用規約</h3>
 
       <p class="font-semibold mt-3">免責事項</p>
-      <p>本サービスはAI翻訳です。提出前に必ずご確認ください。責任は負いません。</p>
+      <p>
+        本サービスはAI（人工知能）を用いた翻訳サービスです。
+        翻訳の正確性については最善を尽くしておりますが、
+        公的機関への提出に際しては、必ずユーザー自身で内容の最終確認を行ってください。
+        本サービスを利用したことによって生じたいかなる不利益についても、
+        運営者は一切の責任を負いません。
+      </p>
 
       <p class="font-semibold mt-3">データの取り扱い</p>
-      <p>画像は処理後すぐ削除されます。</p>
+      <p>
+        ユーザーがアップロードした画像データは、
+        翻訳処理完了後、サーバー上から即座に破棄されます。
+      </p>
     </div>
 
+    <!-- プライバシーポリシー -->
     <div>
-      <h3 class="font-bold mb-2">プライバシーポリシー</h3>
+      <h3 class="font-bold text-lg mb-2">プライバシーポリシー</h3>
 
-      <p class="font-semibold mt-3">個人情報</p>
-      <p>翻訳目的以外では使用しません。</p>
+      <p class="font-semibold mt-3">個人情報の収集</p>
+      <p>
+        本サービスでは、翻訳処理のために画像データおよび翻訳者情報を取得しますが、
+        これらはPDF生成の目的以外には使用しません。
+      </p>
 
       <p class="font-semibold mt-3">外部サービス</p>
-      <p>Google Gemini APIを利用しています。</p>
+      <p>
+        本サービスは Google Gemini API を利用して解析を行っています。
+        送信されたデータはGoogleのプライバシーポリシーに従って処理されます。
+      </p>
     </div>
 
   </div>
