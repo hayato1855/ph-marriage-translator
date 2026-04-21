@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>AI翻訳サービス</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-8 rounded-2xl shadow-xl w-96">
+
+<h2 class="text-xl font-bold mb-4 text-center">翻訳PDF生成</h2>
+
+<form id="form">
+
+<div class="mb-4">
+  <div class="flex rounded-xl border overflow-hidden">
+    <label class="flex-1 cursor-pointer">
+      <input type="radio" name="doc_type" value="cenomar" class="hidden peer" checked>
+      <div class="text-center py-3 bg-blue-600 text-white peer-checked:bg-blue-600 peer-checked:text-white">
+        独身証明書
+      </div>
+    </label>
+
+    <label class="flex-1 cursor-pointer">
+      <input type="radio" name="doc_type" value="birth_certificate" class="hidden peer">
+      <div class="text-center py-3 bg-gray-100 text-gray-700 peer-checked:bg-blue-600 peer-checked:text-white">
+        出生証明書
+      </div>
+    </label>
+  </div>
+</div>
+
+<input type="file" id="file" class="mb-3 w-full">
+<input type="text" id="name" placeholder="翻訳者名" class="border p-2 w-full mb-3">
+<input type="text" id="address" placeholder="住所" class="border p-2 w-full mb-3">
+
+<button class="bg-blue-600 text-white w-full p-3 rounded-lg text-lg hover:bg-blue-700">
+PDFを生成する
+</button>
+
+<p class="text-xs text-gray-500 mt-4 text-center">
+ダウンロードすることで
+<a href="/#legal" class="text-blue-600 underline">利用規約</a>
+に同意したものとみなします
+</p>
+
+</form>
+
+<p id="error" class="text-red-500 mt-3 text-center"></p>
+</div>
+
+<div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+<div class="bg-white p-6 rounded-xl">
+<div class="h-10 w-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+</div>
+</div>
+
+<script src="/static/main.js"></script>
+</body>
+</html>
